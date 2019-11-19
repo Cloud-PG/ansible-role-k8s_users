@@ -1,0 +1,40 @@
+---
+- hosts: localhost
+  remote_user: root
+  roles:
+    - role: ansible-role-k8s_users
+      users:
+        path: /etc
+        prefix: user
+        name: user01
+      kube_admin:
+        cluster: kubernetes
+        config: |
+          apiVersion: v1
+          clusters:
+          - cluster:
+              certificate-authority-data: DUMMY
+              server: https://mycluster.com:6443
+            name: kubernetes
+          contexts:
+          - context:
+              cluster: kubernetes
+              user: kubernetes-admin
+            name: kubernetes-admin@kubernetes
+          current-context: kubernetes-admin@kubernetes
+          kind: Config
+          preferences: {}
+          users:
+          - name: kubernetes-admin
+            user:
+              client-certificate-data: DUMMY
+              client-key-data: DUMMY
+        ca_cert_file: | 
+          -----BEGIN CERTIFICATE-----
+          DUMMY
+          -----END CERTIFICATE-----
+        ca_cert_key: |
+          -----BEGIN RSA PRIVATE KEY-----
+          DUMMY
+          -----END RSA PRIVATE KEY-----
+        kube_admin.ca_oneline: DUMMY

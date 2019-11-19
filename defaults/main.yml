@@ -1,0 +1,17 @@
+---
+# defaults file for ansible-role-k8s_users
+kube_admin:
+  config: |-
+    testme
+  ca_cert_file: |-
+    dasda
+  ca_cert_key: |-
+    asdad
+  ca_oneline: dasda
+  cluster: kubernetes
+  cluster_url: https://mycluster.com:6443
+
+users:
+  number: 2
+  prefix: user
+  path: /home

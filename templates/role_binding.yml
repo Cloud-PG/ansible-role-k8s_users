@@ -1,0 +1,34 @@
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: {{ users.name }}-binding
+  namespace: {{ users.name }}
+subjects:
+- kind: User
+  name: {{ users.name }}
+  apiGroup: ""
+- kind: User
+  name: "system:serviceaccount:default:{{ users.name }}"
+  apiGroup: ""  
+roleRef:
+  kind: Role
+  name: {{ users.name }}-manager
+  apiGroup: ""
+---
+
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: {{ users.name }}-binding-ro
+  namespace: {{ users.name }}
+subjects:
+- kind: User
+  name: {{ users.name }}
+  apiGroup: ""
+- kind: User
+  name: "system:serviceaccount:default:{{ users.name }}"
+  apiGroup: ""  
+roleRef:
+  kind: ClusterRole
+  name: {{ users.name }}-manager-ro
+  apiGroup: rbac.authorization.k8s.io

@@ -1,0 +1,72 @@
+---
+# tasks file for ansible-role-k8s_users
+- name: mkdir for admin
+  command: mkdir -p "{{ users.path }}/admin"
+
+- name: write admin kubeconfig
+  copy:
+    content: "{{ kube_admin.config }}"
+    dest: "{{ users.path }}/admin/kubeconfig.cfg"
+
+- name: write admin kube ca cert
+  copy:
+    content: "{{ kube_admin.ca_cert_file }}"
+    dest: "{{ users.path }}/admin/ca.crt"
+
+- name: write admin kube ca key
+  copy:
+    content: "{{ kube_admin.ca_cert_key }}"
+    dest: "{{ users.path }}/admin/ca.key"
+    mode: 0600
+
+- name: setup users
+  block:
+    - name: create user namespaces
+      command: kubectl create namespace {{ users.name }}
+      ignore_errors: yes
+    - name: create user serviceaccount
+      command: kubectl create serviceaccount {{ users.name }}
+      ignore_errors: yes
+    - name: mkdir for users
+      command: mkdir -p {{ users.path }}/{{ users.name }}
+    - name: create user keys 
+      command: openssl genrsa -out {{ users.path }}/{{ users.name }}/{{ users.name }}.key 2048
+    - name: create user crs
+      command: openssl req -new -key {{ users.path }}/{{ users.name }}/{{ users.name }}.key -out {{ users.path }}/{{ users.name }}/{{ users.name }}.csr -subj "/CN={{ users.name }}/O=INFN"
+    - name: create user crt
+      command: openssl x509 -req -in {{ users.path }}/{{ users.name }}/{{ users.name }}.csr -CA  {{ users.path }}/admin/ca.crt -CAkey  {{ users.path }}/admin/ca.key -CAcreateserial -out {{ users.path }}/{{ users.name }}/{{ users.name }}.crt -days 500
+    - name: create kube user
+      command: kubectl config set-credentials {{ users.name }} --client-certificate={{ users.path }}/{{ users.name }}/{{ users.name }}.crt  --client-key={{ users.path }}/{{ users.name }}/{{ users.name }}.key
+    - name: create kube context
+      command: kubectl config set-context {{ users.name }}-context --cluster={{ kube_admin.cluster }} --namespace={{ users.name }} --user={{ users.name }}
+    - name: compile role yaml
+      template:
+        src: templates/role.yml
+        dest: "{{ users.path }}/{{ users.name }}/role.yml"
+    - name: compile role binding yaml
+      template:
+        src: templates/role_binding.yml
+        dest: "{{ users.path }}/{{ users.name }}/role_binding.yml"
+    - name: delete role
+      command: kubectl delete -f {{ users.path }}/{{ users.name }}/role.yml
+      ignore_errors: yes
+    - name: delete role binding
+      command: kubectl delete -f {{ users.path }}/{{ users.name }}/role_binding.yml
+      ignore_errors: yes
+    - name: create role
+      command: kubectl apply -f {{ users.path }}/{{ users.name }}/role.yml
+    - name: create role binding
+      command: kubectl apply -f {{ users.path }}/{{ users.name }}/role_binding.yml
+    - name: compile user kubeconfig
+      template:
+        src: templates/kubeconfig.yml
+        dest: "{{ users.path }}/{{ users.name }}/kubeconfig.yml"
+
+  # TODO: get token and save to file
+  environment:
+        KUBECONFIG: "{{ users.path }}/admin/kubeconfig.cfg"
+
+- name: rm admin file
+  command: rm {{ users.path }}/admin/kubeconfig.cfg
+  ignore_errors: yes
+
