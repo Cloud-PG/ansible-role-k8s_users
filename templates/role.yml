@@ -12,10 +12,9 @@ rules:
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  namespace: {{ users.name }}
   name: {{ users.name }}-manager-ro
 rules:
 - apiGroups: [""]
-  resources: ["nodes", "namespaces"]
-  verbs: ["get", "list", "watch"]
+  resources: ["nodes", "namespaces", "deployments", "replicasets", "pods", "events", "services", "configmaps"]
+  verbs: ["get", "list", "watch","create", "update"]
   
