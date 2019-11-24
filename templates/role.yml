@@ -5,7 +5,7 @@ metadata:
   name: {{ users.name }}-manager
 rules:
 - apiGroups: ["", "extensions", "apps"]
-  resources: ["deployments", "replicasets", "pods", "events", "services", "configmaps", "secrets"]
+  resources: ["pods/exec", "pods/log", "deployments", "replicasets", "pods", "events", "services", "configmaps", "secrets"]
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"] # You can also use ["*"]
 
 ---
