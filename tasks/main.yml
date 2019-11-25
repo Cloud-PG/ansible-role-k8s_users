@@ -25,7 +25,7 @@
       command: kubectl create namespace {{ users.name }}
       ignore_errors: yes
     - name: create user serviceaccount
-      command: kubectl create serviceaccount {{ users.name }}
+      command: kubectl create serviceaccount -n {{ users.name }} {{ users.name }}
       ignore_errors: yes
     - name: mkdir for users
       command: mkdir -p {{ users.path }}/{{ users.name }}

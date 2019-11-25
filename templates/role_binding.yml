@@ -26,7 +26,7 @@ subjects:
   name: {{ users.name }}
   apiGroup: ""
 - kind: User
-  name: "system:serviceaccount:default:{{ users.name }}"
+  name: "system:serviceaccount:{{ users.name }}:{{ users.name }}"
   apiGroup: ""  
 roleRef:
   kind: ClusterRole
