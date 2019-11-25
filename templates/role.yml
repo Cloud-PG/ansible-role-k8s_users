@@ -15,6 +15,6 @@ metadata:
   name: {{ users.name }}-manager-ro
 rules:
 - apiGroups: ["", "apps"]
-  resources: ["deployments/scale", "pods/exec", "pods/log", "deployments", "replicasets", "pods", "events", "services", "configmaps", "secrets", "service", "serviceaccounts"]
+  resources: ["nodes", "deployments/scale", "pods/exec", "pods/log", "deployments", "replicasets", "pods", "events", "services", "configmaps", "secrets", "service", "serviceaccounts"]
   verbs: ["get", "list", "watch","create", "update"]
   
